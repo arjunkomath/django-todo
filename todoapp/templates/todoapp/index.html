@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	
+	<title>Todo</title>
+
+	<!-- Bootstrap -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.0/angular.min.js"></script>
+	<script src="https://cdn.rawgit.com/chieffancypants/angular-loading-bar/master/src/loading-bar.js"></script>
+	<link rel='stylesheet' href='https://cdn.rawgit.com/chieffancypants/angular-loading-bar/master/src/loading-bar.css' type='text/css' media='all' />
+	<style type="text/css">
+		.tag {
+			font-size: 1.2em;
+			padding: 5px;
+		}
+	</style>
+</head>
+
+<script>
+	var app = angular.module("App", ['angular-loading-bar']);
+	app.controller("Ctrl", function($scope, $http) {
+		$scope.todos = [];
+		$scope.keyword = '';
+
+		$scope.listTodos = function() {
+			if($scope.loading)
+				return false;
+			$scope.loading = true;
+			$http.get('/api/todo')
+			.then( function(res) {
+				$scope.todos = res.data.todos;
+				$scope.tags = res.data.tags;
+				$scope.loading = false;
+			})
+		}
+		$scope.listTodos();
+
+		$scope.add = function() {
+			console.log($scope.query);
+			if(!$scope.query.trim())
+				return false;
+			$http.get('/api/todo?query='+$scope.query)
+			.then( function(res) {
+				console.log(res.data);
+				$scope.listTodos();
+				$scope.query = '';
+			});
+		}
+
+		$scope.search = function(tag) {
+			if($scope.loading)
+				return false;
+			$scope.loading = true;
+			if(!$scope.keyword.trim() && !tag)
+				$scope.listTodos();
+			if(tag)
+				$scope.keyword = tag;
+			$http.get('/api/todo?keyword='+$scope.keyword)
+			.then( function(res) {
+				$scope.todos = res.data.todos;
+				$scope.tags = res.data.tags;
+				$scope.loading = false;
+			});
+		}
+
+	});
+</script>
+
+<body>
+
+	{% verbatim %}
+	<div ng-app="App">
+		<div ng-controller="Ctrl">
+
+			<div class="container" ng-cloak>
+
+				<div class="page-header">
+					<h1>Django Todo</h1>
+				</div>
+
+				<div class="row">
+					<div class="col-md-5">
+						<input ng-model="query" class="form-control" placeholder="todo,tag,tag..." />
+					</div>
+
+					<div class="col-md-1">
+						<button class="btn btn-success btn-sm" ng-click="add()">Add</button>
+					</div>
+
+					<div class="col-md-6">
+						<input ng-model="keyword" class="form-control" placeholder="search keyword" ng-model-options="{ debounce: 500 }" ng-change="search()"/>
+					</div>
+
+				</div>
+				<br>
+
+				<div class="row">
+
+					<div class="col-md-8">
+
+						<div ng-show="loading">
+							<center><i class="fa fa-cog fa-spin fa-3x fa-fw margin-bottom"></i></center>
+						</div>
+
+						<div class="panel panel-default" ng-repeat="todo in todos">
+							<div class="panel-body">
+								<h4>{{ todo.fields.todo_text }}</h4>
+								<span class="label label-default" ng-repeat="tag in tags[todo.pk]">{{ tag }}</span>
+							</div>
+						</div>
+					</div>
+
+					<div class="col-md-4">
+						<h4>TAGS <small ng-click="listTodos()">CLEAR</small></h4>
+						<span ng-repeat="todo in todos">
+							<a class="tag" href="#!" ng-repeat="tag in tags[todo.pk]" ng-click="search(tag);">{{ tag }}</a>
+						</span>
+					</div>
+
+				</div>
+
+			</div>
+
+		</div>
+	</div>
+	{% endverbatim %}
+
+	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+	<!-- Include all compiled plugins (below), or include individual files as needed -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+</body>
+</html>
