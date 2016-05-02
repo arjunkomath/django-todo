@@ -88,7 +88,7 @@ def todo(request, id = None):
 				response = json.dumps({'errors': ['No Items found'], 'success': False})
 				return HttpResponse(response, content_type="application/json")
 
-	# delete, @return json
+	# update, @return json
 	elif request.method == 'PUT':
 		if id == None:
 			return HttpResponseBadRequest('ID missing')
@@ -127,5 +127,6 @@ def todo(request, id = None):
 			else:
 				return HttpResponseBadRequest('Query missing')
 
+	# Invalid method, @return json
 	else:
 		return HttpResponseNotAllowed('Method not allowed')
