@@ -4,7 +4,7 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	
+
 	<title>Todo</title>
 
 	<!-- Bootstrap -->
@@ -43,8 +43,12 @@
 			console.log($scope.query);
 			if(!$scope.query.trim())
 				return false;
-			$http.get('/api/todo?query='+$scope.query)
-			.then( function(res) {
+			$http({
+				method: 'post',
+				url: '/api/todo/',
+				headers : {'Content-Type': 'application/x-www-form-urlencoded'},
+				data: $.param({ query: $scope.query })
+			}).then( function(res) {
 				console.log(res.data);
 				$scope.listTodos();
 				$scope.query = '';
