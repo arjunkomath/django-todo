@@ -8,7 +8,7 @@ Basic todo app ( https://arcane-sands-10463.herokuapp.com )
 ```
 headers : {'Content-Type': 'application/x-www-form-urlencoded'}
 POST /api/todo
-parameters: { query : 'todo,tag1,tag2...' }
+body: { query : 'todo,tag1,tag2...' }
 ```
 
 ### Read (GET): List todos, all or by id
@@ -22,7 +22,7 @@ List todo by id - `GET /api/todo/:id`
 ```
 headers : {'Content-Type': 'application/x-www-form-urlencoded'}
 PUT /api/todo:id
-parameters: { query : 'todo,tag1,tag2...' }
+body: { query : 'todo,tag1,tag2...' }
 ```
 
 ### Delete (DELETE): Delete todo by id
